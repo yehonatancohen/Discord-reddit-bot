@@ -2,7 +2,7 @@ import discord
 import json
 from discord.ext import commands
 
-token = 'NzMxMTY3NDI3MzI4NDc1MTM3.XwmPOQ.YkccB0paUbgpl6bgoXQ6xYV2grI'
+token = ''
 
 c = commands.Bot(command_prefix = '.')
 c.remove_command('help')
