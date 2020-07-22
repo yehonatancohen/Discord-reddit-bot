@@ -1,6 +1,9 @@
 import discord
 import json
 from discord.ext import commands
+from importlib.machinery import SourceFileLoader
+
+cfg = SourceFileLoader('cfg', 'config.cfg').load_module()
 
 token = ''
 
