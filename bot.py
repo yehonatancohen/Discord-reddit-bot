@@ -5,7 +5,7 @@ from importlib.machinery import SourceFileLoader
 
 cfg = SourceFileLoader('cfg', 'config.cfg').load_module()
 
-token = ''
+token = cfg.DISCORD_TOKEN
 
 c = commands.Bot(command_prefix = '.')
 c.remove_command('help')
