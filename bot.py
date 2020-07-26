@@ -14,6 +14,7 @@ max_command_amount = cfg.MAX_COMMAND_AMOUNT
 c = commands.Bot(command_prefix = '.')
 c.remove_command('help')
 
+nsfw_url = cfg.NSFW_URL
 
 curr_tasks = []
 
@@ -23,64 +24,18 @@ reddit = praw.Reddit(client_id=cfg.REDDIT_CLIENT_ID,
 
 @c.event
 async def on_ready():
-    await c.change_presence(activity=discord.Streaming(name=f'{len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
+    await c.change_presence(activity=discord.Streaming(name=f'{len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ')) #Rick roll status :P
 
 @c.command(aliases=['hot'])
-async def get_hot(ctx,amount,subreddit):
-    urls = []
-    am = int(amount)
-    if am > max_command_amount:
-        await ctx.channel.send(f"{ctx.message.author.mention} The maximum amount for posts per command is: `{str(max_command_amount)}`")
-    for submission in reddit.subreddit(subreddit).hot(limit=am):
-        if submission.over_18:
-            if ctx.channel.is_nsfw():
-                if not submission.is_self:
-                    urls.append(submission.title + "\n" + submission.url)
-                else:
-                    urls.append(submission.title)
-            else:
-                urls.append("This submission is NSFW and this channel is not!")
-        else:
-            if not submission.is_self:
-                    urls.append(submission.title + "\n" + submission.url)
-            else:
-                urls.append(submission.title)
-
-        #await ctx.channel.send(submission.url)
-        pass
+async def get_hot(ctx,subreddit):
     tmp_task = Task
     id = len(curr_tasks) + 1
-    tmp_task.init(tmp_task,ctx.message,id,urls,subreddit,ctx.guild.id,c)
+    tmp_task.init(tmp_task,ctx.message,id,subreddit,ctx.guild.id,c,reddit,nsfw_url)
     curr_tasks.append(tmp_task)
     await tmp_task.send_submissions(tmp_task)
 
-@c.command(aliases=['top'])
-async def get_top(ctx,amount,subreddit):
-    urls = []
-    am = int(amount)
-    if am > max_command_amount:
-        await ctx.channel.send(f"{ctx.message.author.mention} The maximum amount for posts per command is: `{str(max_command_amount)}`")
-    for submission in reddit.subreddit(subreddit).top(limit=am):
-        urls.append(submission.url)
-        #await ctx.channel.send(submission.url)
-        pass
-
-@c.command(aliases=['new'])
-async def get_new(ctx,amount,subreddit):
-    urls = []
-    am = int(amount)
-    if am > max_command_amount:
-        await ctx.channel.send(f"{ctx.message.author.mention} The maximum amount for posts per command is: `{str(max_command_amount)}`")
-    for submission in reddit.subreddit(subreddit).new(limit=am):
-        urls.append(submission.url)
-        #await ctx.channel.send(submission.url)
-        pass
-
-
-
 @c.command()
 async def print_info(ctx):
-    print("Test")
     tsk = curr_tasks[0]
     await ctx.channel.send(tsk.urls)
     pass
