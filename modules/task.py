@@ -13,7 +13,8 @@ class Task:
     author = discord.Member
     reddit = praw.Reddit
     nsfw_url = ""
-    def init(self, msg : discord.Message, id,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url):
+    setting = ""
+    def __init__(self, msg : discord.Message, id,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url, setting):
         self.id = id
         self.subreddit = subreddit
         self.guildid = guildid
@@ -22,9 +23,10 @@ class Task:
         self.author = msg.author
         self.reddit = reddit
         self.nsfw_url = nsfw_url
+        self.setting = setting
 
     async def send_submissions(self):
-        self.smsg = await self.send_msg(self)
+        self.smsg = await self.send_msg()
         await self.smsg.add_reaction("◀️")
         await self.smsg.add_reaction("▶️")
 
@@ -62,7 +64,7 @@ class Task:
 
     async def edit_msg(self):
         channel = self.smsg.channel
-        submission = self.get_hot_post(self)
+        submission = self.get_hot_post()
         if submission.over_18:
                 if channel.is_nsfw():
                     if not submission.is_self:
@@ -78,7 +80,7 @@ class Task:
                 await self.smsg.edit(content=submission.title)
 
     async def send_msg(self):
-        submission = self.get_hot_post(self)
+        submission = self.get_hot_post()
         smsg = discord.Message
         channel = self.msg.channel
         if submission.over_18:
@@ -97,7 +99,7 @@ class Task:
         return smsg
 
     async def reaction_added(self,payload : discord.RawReactionActionEvent):
-        reaction = await self.get_reaction(self,payload,payload.member)
+        reaction = await self.get_reaction(payload,payload.member)
         if payload.member == self.c.user:
             return
         if payload.member != self.author:
@@ -105,9 +107,9 @@ class Task:
             return
         if payload.emoji.name == "▶️":
             self.curr_submission += 1
-            await self.edit_msg(self)
+            await self.edit_msg()
         if payload.emoji.name == "◀️":
             if self.curr_submission > 0:
                 self.curr_submission -= 1
-                await self.edit_msg(self)
+                await self.edit_msg()
         await reaction.remove(payload.member)

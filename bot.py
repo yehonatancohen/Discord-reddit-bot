@@ -1,8 +1,9 @@
 import discord
 import json
+import praw
+import re
 from discord.ext import commands
 from importlib.machinery import SourceFileLoader
-import praw
 from modules.task import Task
 
 cfg = SourceFileLoader('cfg', 'config.cfg').load_module()
@@ -26,25 +27,22 @@ reddit = praw.Reddit(client_id=cfg.REDDIT_CLIENT_ID,
 async def on_ready():
     await c.change_presence(activity=discord.Streaming(name=f'{len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ')) #Rick roll status :P
 
-@c.command(aliases=['hot'])
-async def get_hot(ctx,subreddit):
-    tmp_task = Task
+async def create_task(msg : discord.Message,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url, setting):
     id = len(curr_tasks) + 1
-    tmp_task.init(tmp_task,ctx.message,id,subreddit,ctx.guild.id,c,reddit,nsfw_url)
-    curr_tasks.append(tmp_task)
-    await tmp_task.send_submissions(tmp_task)
+    task = Task(msg,id,subreddit,guildid,c,reddit,nsfw_url, setting)
+    curr_tasks.append(task)
+    await curr_tasks[id - 1].send_submissions()
 
-@c.command()
-async def print_info(ctx):
-    tsk = curr_tasks[0]
-    await ctx.channel.send(tsk.urls)
-    pass
+@c.command(aliases=['new','top'])
+async def hot(ctx,subreddit):
+    command = ctx.message.content.split(' ')[0].split('.')[1]
+    await create_task(ctx.message,subreddit,ctx.guild.id,c,reddit,nsfw_url,command)
 
 @c.event
 async def on_raw_reaction_add(payload):
     msgid = payload.message_id
     task = get_task(msgid)
-    await task.reaction_added(task,payload)
+    await task.reaction_added(payload)
 
 def get_task(msgid):
     for task in curr_tasks:
