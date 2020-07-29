@@ -67,5 +67,7 @@ async def help(ctx):
     embed.add_field(name='.top {subreddit}', value='Sends the top submissions by order', inline=False)
     embed.add_field(name='.new {subreddit}', value='Sends the new submissions by order', inline=False)
 
+    await ctx.channel.send(embed=embed)
+
   
 c.run(token)
