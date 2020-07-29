@@ -2,24 +2,24 @@ import discord
 import json
 import praw
 import re
+import os
 from discord.ext import commands
 from importlib.machinery import SourceFileLoader
 from modules.task import Task
 
-cfg = SourceFileLoader('cfg', 'config.cfg').load_module()
 
-token = cfg.DISCORD_TOKEN
+token = os.environ['DISCORD_TOKEN']
 
 c = commands.Bot(command_prefix = '.')
 c.remove_command('help')
 
-nsfw_url = cfg.NSFW_URL
+nsfw_url = os.environ['NSFW_URL']
 
 curr_tasks = []
 
-reddit = praw.Reddit(client_id=cfg.REDDIT_CLIENT_ID,
-                     client_secret=cfg.REDDIT_CLIENT_SECRET,
-                     user_agent=cfg.REDDIT_USER_AGENT)
+reddit = praw.Reddit(client_id=os.environ['REDDIT_CLIENT_ID'],
+                     client_secret=os.environ['REDDIT_CLIENT_SECRET'],
+                     user_agent=os.environ['REDDIT_USER_AGENT'])
 
 @c.event
 async def on_ready():
@@ -28,7 +28,7 @@ async def on_ready():
 
 async def create_task(msg : discord.Message,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url, setting):
     id = len(curr_tasks) + 1
-    task = Task(msg,id,subreddit,guildid,c,reddit,nsfw_url, setting, cfg.UPVOTE_UNICODE, cfg.DOWNVOTE_UNICODE, cfg.WUBBLE_UNICODE, cfg.SAD_UNICODE)
+    task = Task(msg,id,subreddit,guildid,c,reddit,nsfw_url, setting, os.environ['UPVOTE_UNICODE'], os.environ['DOWNVOTE_UNICODE'], os.environ['WUBBLE_UNICODE'], os.environ['SAD_UNICODE'])
     curr_tasks.append(task)
     await curr_tasks[id - 1].send_submissions()
 
