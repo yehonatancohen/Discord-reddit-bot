@@ -24,7 +24,7 @@ reddit = praw.Reddit(client_id=os.environ['REDDIT_CLIENT_ID'],
 @c.event
 async def on_ready():
     print(f"{c.user.name}")
-    await c.change_presence(activity=discord.Streaming(name=f'{len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ')) #Rick roll status :P
+    await c.change_presence(activity=discord.Streaming(name=f'.help | {len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ')) #Rick roll status :P
 
 async def create_task(msg : discord.Message,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url, setting):
     id = len(curr_tasks) + 1
@@ -52,5 +52,20 @@ def get_task(msgid):
 @c.command()
 async def invite(ctx):
     await ctx.channel.send("Invite this bot to your server today! link: https://discord.com/api/oauth2/authorize?client_id=735196671042125885&permissions=124992&scope=bot")
+
+@c.command(aliases=['helpme'])
+async def help(ctx):
+    author = ctx.message.author
+
+    embed = discord.Embed(
+        colour = discord.Colour.blue()
+    )
+
+    embed.set_author(name='Help')
+
+    embed.add_field(name='.hot {subreddit}', value='Sends the hot submissions by order', inline=False)
+    embed.add_field(name='.top {subreddit}', value='Sends the top submissions by order', inline=False)
+    embed.add_field(name='.new {subreddit}', value='Sends the new submissions by order', inline=False)
+
   
 c.run(token)
