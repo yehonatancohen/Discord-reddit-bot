@@ -18,7 +18,7 @@ class Task:
     downvote_unicode = ""
     wubble_unicode = ""
     sad_unicode = ""
-    scored = False
+
     def __init__(self, msg : discord.Message, id,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url, setting, upvote, downvote, wubble, sad):
         self.id = id
         self.subreddit = subreddit
@@ -41,11 +41,13 @@ class Task:
         await self.smsg.add_reaction(self.upvote_unicode)
         await self.smsg.add_reaction(self.downvote_unicode)
 
-    async def get_reaction(self,payload : discord.RawReactionActionEvent, memeber : discord.Member):
+    async def get_reaction(self,member : discord.Member, emoji):
         msg = await self.smsg.channel.fetch_message(self.smsg.id)
         for reaction in msg.reactions:
+            if str(reaction.emoji) != emoji:
+                continue
             async for user in reaction.users():
-                if user == memeber:
+                if user == member:
                     return reaction
         return None
     
@@ -97,41 +99,48 @@ class Task:
         msg = self.get_message()
         self.smsg = await self.msg.channel.send(msg)
 
-    async def send_score(self, score):
-        msg = ""
-        if score == "upvote":
-            msg += f"**Glad you like it {self.wubble_unicode}**\nyou can go upvote it on this url: \nhttps://www.reddit.com{self.get_post().permalink}"
-        if score == "downvote":
-            msg += f"**Sorry you don't like it {self.sad_unicode}**\nyou can go spread negativity on this url: \nhttps://www.reddit.com{self.get_post().permalink}\n{self.sad_unicode}{self.sad_unicode}{self.sad_unicode}"
-        await self.smsg.channel.send(content=msg)
-
     async def reaction_added(self,payload : discord.RawReactionActionEvent):
-        reaction = await self.get_reaction(payload,payload.member)
+        reaction = await self.get_reaction(payload.member,str(payload.emoji))
+        reaction_upvote = await self.get_reaction(payload.member,self.upvote_unicode)
+        reaction_downvote = await self.get_reaction(payload.member,self.downvote_unicode)
+
+
         if payload.member == self.c.user:
             return
-        if payload.member != self.author:
+
+        if payload.member != self.author and (payload.emoji.name == "▶️" or payload.emoji.name == "◀️"):
             try:
                 await reaction.remove(payload.member)
                 return
             except:
                 return
+
         if payload.emoji.name == "▶️":
             self.curr_submission += 1
-            self.scored = False
             await self.edit_msg()
+            if reaction_upvote != None:
+                await reaction_upvote.remove(payload.member)
+            if reaction_downvote != None:
+                await reaction_downvote.remove(payload.member)
         if payload.emoji.name == "◀️":
             if self.curr_submission > 0:
                 self.curr_submission -= 1
-                self.scored = False
-                await self.send_msg()
-        if (str(payload.emoji) == self.upvote_unicode or str(payload.emoji) == self.downvote_unicode) and self.scored:
-            await self.smsg.channel.send(f"{self.msg.author.mention} **You can't do that again** {self.sad_unicode}")
-            await reaction.remove(payload.member)
-            return
+                await self.edit_msg()
+                if reaction_upvote != None:
+                    await reaction_upvote.remove(payload.member)
+                if reaction_downvote != None:
+                    await reaction_downvote.remove(payload.member)
+
         if str(payload.emoji) == self.upvote_unicode:
-            await self.send_score("upvote")
-            self.scored = True
+            if reaction_downvote == None:
+                return
+            else:
+                await reaction_downvote.remove(payload.member)
+                return
         if str(payload.emoji) == self.downvote_unicode:
-            await self.send_score("downvote")
-            self.scored = True
+            if reaction_upvote == None:
+                return
+            else:
+                await reaction_upvote.remove(payload.member)
+                return
         await reaction.remove(payload.member)
