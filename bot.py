@@ -10,8 +10,6 @@ cfg = SourceFileLoader('cfg', 'config.cfg').load_module()
 
 token = cfg.DISCORD_TOKEN
 
-max_command_amount = cfg.MAX_COMMAND_AMOUNT
-
 c = commands.Bot(command_prefix = '.')
 c.remove_command('help')
 
@@ -25,11 +23,12 @@ reddit = praw.Reddit(client_id=cfg.REDDIT_CLIENT_ID,
 
 @c.event
 async def on_ready():
+    print(f"{c.user.name}")
     await c.change_presence(activity=discord.Streaming(name=f'{len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ')) #Rick roll status :P
 
 async def create_task(msg : discord.Message,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url, setting):
     id = len(curr_tasks) + 1
-    task = Task(msg,id,subreddit,guildid,c,reddit,nsfw_url, setting)
+    task = Task(msg,id,subreddit,guildid,c,reddit,nsfw_url, setting, cfg.UPVOTE_UNICODE, cfg.DOWNVOTE_UNICODE, cfg.WUBBLE_UNICODE, cfg.SAD_UNICODE)
     curr_tasks.append(task)
     await curr_tasks[id - 1].send_submissions()
 
