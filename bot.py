@@ -24,7 +24,11 @@ reddit = praw.Reddit(client_id=os.environ['REDDIT_CLIENT_ID'],
 @c.event
 async def on_ready():
     print(f"{c.user.name}")
-    await c.change_presence(activity=discord.Streaming(name=f'.help | {len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ')) #Rick roll status :P
+    await c.change_presence(activity=discord.Streaming(name=f'.help | {len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
+
+@c.event
+async def on_guild_join():
+    await c.change_presence(activity=discord.Streaming(name=f'.help | {len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
 
 async def create_task(msg : discord.Message,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url, setting):
     id = len(curr_tasks) + 1
@@ -66,6 +70,7 @@ async def help(ctx):
     embed.add_field(name='.hot {subreddit}', value='Sends the hot submissions by order', inline=False)
     embed.add_field(name='.top {subreddit}', value='Sends the top submissions by order', inline=False)
     embed.add_field(name='.new {subreddit}', value='Sends the new submissions by order', inline=False)
+    embed.add_field(name='.invite {subreddit}', value="Sends the bot's invite link for you to invite it to your server!", inline=False)
 
     await ctx.channel.send(embed=embed)
 
