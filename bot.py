@@ -55,7 +55,7 @@ def get_task(msgid):
 
 @c.command()
 async def invite(ctx):
-    await ctx.channel.send("Invite this bot to your server today! link: https://discord.com/api/oauth2/authorize?client_id=735196671042125885&permissions=124992&scope=bot")
+    await ctx.channel.send("Invite this bot to your server today! link: \nhttps://discord.com/api/oauth2/authorize?client_id=735196671042125885&permissions=124992&scope=bot")
 
 @c.command(aliases=['helpme'])
 async def help(ctx):
