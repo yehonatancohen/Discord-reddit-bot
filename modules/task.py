@@ -79,16 +79,16 @@ class Task:
         if submission.over_18:
                 if channel.is_nsfw():
                     if not submission.is_self:
-                        msg = submission.title + "\n" + upvotes + "\n" + submission.url
+                        msg = submission.title + "\n" + upvotes + "\n" + submission.author.name + "\n" + submission.url
                     else:
-                        msg = submission.title + "\n" + upvotes + "\n"
+                        msg = submission.title + "\n" + upvotes + "\n" + submission.author.name
                 else:
                     msg = self.nsfw_url
         else:
             if not submission.is_self:
-                msg = submission.title + "\n" + upvotes + "\n" + submission.url
+                msg = submission.title + "\n" + upvotes + "\n" + submission.url + "\n" + submission.author.name
             else:
-                msg = submission.title + "\n" + upvotes + "\n"
+                msg = submission.title + "\n" + upvotes + "\n" + submission.author.name + "\n"
         return msg
         
     async def edit_msg(self):
