@@ -27,11 +27,11 @@ async def on_ready():
     await c.change_presence(activity=discord.Streaming(name=f'.help | {len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
 
 @c.event
-async def on_guild_join():
+async def on_guild_join(guild):
     await c.change_presence(activity=discord.Streaming(name=f'.help | {len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
 
 @c.event
-async def on_guild_remove():
+async def on_guild_remove(guild):
     await c.change_presence(activity=discord.Streaming(name=f'.help | {len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
 
 async def create_task(msg : discord.Message,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url, setting):
@@ -80,7 +80,7 @@ async def help(ctx):
 
 @c.command()
 async def servers(ctx):
-    await ctx.channel.send(f"**I'm in {len(c.guilds)} servers!")
+    await ctx.channel.send(f"**I'm in {len(c.guilds)} servers!**")
 
   
 c.run(token)
