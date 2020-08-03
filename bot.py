@@ -78,5 +78,9 @@ async def help(ctx):
 
     await ctx.channel.send(embed=embed)
 
+@c.command()
+async def servers(ctx):
+    await ctx.channel.send(f"**I'm in {len(c.guilds)} servers!")
+
   
 c.run(token)
