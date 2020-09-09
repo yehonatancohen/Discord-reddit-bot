@@ -50,6 +50,7 @@ async def hot(ctx,subreddit):
 
 @c.event
 async def on_raw_reaction_add(payload):
+    if payload.member.bot: return
     msgid = payload.message_id
     task = get_task(msgid)
     if task == None: return

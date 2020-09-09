@@ -7,7 +7,7 @@ class Task:
     subreddit = ""
     guildid = 0
     msg : discord.Message
-    smsg = None
+    smsg : discord.Message
     c : discord.Client
     curr_submission = 0
     author : discord.Member
