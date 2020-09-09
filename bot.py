@@ -7,7 +7,6 @@ from discord.ext import commands
 from importlib.machinery import SourceFileLoader
 from modules.task import Task
 
-
 token = os.environ['DISCORD_TOKEN']
 
 c = commands.Bot(command_prefix = '.')
@@ -36,19 +35,24 @@ async def on_guild_remove(guild):
 
 async def create_task(msg : discord.Message,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url, setting):
     id = len(curr_tasks) + 1
-    task = Task(msg,id,subreddit,guildid,c,reddit,nsfw_url, setting, os.environ['UPVOTE_UNICODE'], os.environ['DOWNVOTE_UNICODE'], os.environ['WUBBLE_UNICODE'], os.environ['SAD_UNICODE'])
+    task = Task(msg,id,subreddit,guildid,c,reddit,nsfw_url, setting, os.environ['UPVOTE_UNICODE'],os.environ['DOWNVOTE_UNICODE'], os.environ['WUBBLE_UNICODE'], os.environ['SAD_UNICODE'])
     curr_tasks.append(task)
     await curr_tasks[id - 1].send_submissions()
 
 @c.command(aliases=['new','top'])
 async def hot(ctx,subreddit):
-    command = ctx.message.content.split(' ')[0].split('.')[1]
+    command = ctx.message.content.split(' ')[0].split('?')[1]
+    try:
+        reddit.subreddit(subreddit)._fetch()
+    except:
+        await ctx.channel.send("Subreddit does not exist!")
     await create_task(ctx.message,subreddit,ctx.guild.id,c,reddit,nsfw_url,command)
 
 @c.event
 async def on_raw_reaction_add(payload):
     msgid = payload.message_id
     task = get_task(msgid)
+    if task == None: return
     await task.reaction_added(payload)
 
 def get_task(msgid):
@@ -82,5 +86,14 @@ async def help(ctx):
 async def servers(ctx):
     await ctx.channel.send(f"**I'm in {len(c.guilds)} servers!**")
 
+async def get_tasks(ctx):
+    return_list = []
+    for task in curr_tasks:
+        try:
+            if task.author == ctx.author:
+                return_list.append(task)
+        except:
+            await ctx.channel.send("An error occured")
+    return return_list
   
 c.run(token)

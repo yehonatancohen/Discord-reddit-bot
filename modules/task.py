@@ -35,7 +35,8 @@ class Task:
         self.sad_unicode = sad
 
     async def send_submissions(self):
-        await self.send_msg()
+        msg = self.get_message()
+        self.smsg = await self.msg.channel.send(embed=msg)
         await self.smsg.add_reaction("◀️")
         await self.smsg.add_reaction("▶️")
         await self.smsg.add_reaction(self.upvote_unicode)
@@ -61,43 +62,41 @@ class Task:
             i += 1
         return None
 
-    def upvotes_parse(self, upvotes):
-        if upvotes > 1000:
-            upvotes = round(upvotes / 1000)
-            return "**" + str(upvotes) + "K Upvotes**"
-        elif upvotes > 1000000:
-            round(upvotes / 1000000)
-            return "**" + str(upvotes) + "M Upvotes**"
-        else:
-            return "**" + str(upvotes) + " Upvotes**"
-
     def get_message(self):
         channel = self.msg.channel
         submission = self.get_post()
-        msg = ""
-        upvotes = self.upvotes_parse(submission.score)
+        embed : praw.Embed
         if submission.over_18:
                 if channel.is_nsfw():
                     if not submission.is_self:
-                        msg = submission.title + "\n" + upvotes + "\n" + submission.author.name + "\n" + submission.url
+                        embed=discord.Embed(title=submission.title, url=f"https://www.reddit.com{submission.permalink}", color=0xfa0000)
+                        embed.set_image(url=submission.url)
+                        embed.set_footer(text=f"⬆️ {submission.score} | 💬 {submission.num_comments} | NSFW")
                     else:
-                        msg = submission.title + "\n" + upvotes + "\n" + submission.author.name
+                        embed=discord.Embed(title=submission.title, url=f"https://www.reddit.com{submission.permalink}", color=0xfa0000)
+                        embed.set_footer(text=f"⬆️ {submission.score} | 💬 {submission.num_comments} | NSFW")
                 else:
-                    msg = self.nsfw_url
+                    embed=discord.Embed(title="This is a NSFW submission", url=f"https://www.reddit.com{submission.permalink}", color=0xfa0000)
+                    embed.set_image(url=self.nsfw_url)
+                    embed.set_footer(text=f"⬆️ {submission.score} | 💬 {submission.num_comments}")
         else:
             if not submission.is_self:
-                msg = submission.title + "\n" + upvotes + "\n" + submission.url + "\n" + submission.author.name
+                embed=discord.Embed(title=submission.title, url=f"https://www.reddit.com{submission.permalink}", color=0xfa0000)
+                embed.set_image(url=submission.url)
+                embed.set_footer(text=f"⬆️ {submission.score} | 💬 {submission.num_comments}")
             else:
-                msg = submission.title + "\n" + upvotes + "\n" + submission.author.name + "\n"
-        return msg
+                embed=discord.Embed(title=submission.title, url=f"https://www.reddit.com{submission.permalink}", color=0xfa0000)
+                embed.set_image(url=submission.url)
+                embed.set_footer(text=f"⬆️ {submission.score} | 💬 {submission.num_comments}")
+        return embed
         
     async def edit_msg(self):
         msg = self.get_message()
-        await self.smsg.edit(content=msg)
+        await self.smsg.edit(embed=msg)
 
     async def send_msg(self):
         msg = self.get_message()
-        self.smsg = await self.msg.channel.send(msg)
+        self.smsg = await self.msg.channel.send(embed=msg)
 
     async def reaction_added(self,payload : discord.RawReactionActionEvent):
         reaction = await self.get_reaction(payload.member,str(payload.emoji))
@@ -108,6 +107,8 @@ class Task:
         if payload.member == self.c.user:
             return
 
+        await reaction.remove(payload.member)
+        
         if payload.member != self.author and (payload.emoji.name == "▶️" or payload.emoji.name == "◀️"):
             try:
                 await reaction.remove(payload.member)
@@ -143,4 +144,3 @@ class Task:
             else:
                 await reaction_upvote.remove(payload.member)
                 return
-        await reaction.remove(payload.member)
