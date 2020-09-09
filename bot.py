@@ -86,6 +86,13 @@ async def help(ctx):
 async def servers(ctx):
     await ctx.channel.send(f"**I'm in {len(c.guilds)} servers!**")
 
+@c.command()
+async def members(ctx):
+    members = 0
+    for guild in c.guilds:
+        members += len(guild.members)
+    await ctx.channel.send(f"**I'm in {len(c.guilds)} servers, with {members} members**")
+
 async def get_tasks(ctx):
     return_list = []
     for task in curr_tasks:
