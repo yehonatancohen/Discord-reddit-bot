@@ -41,7 +41,7 @@ async def create_task(msg : discord.Message,subreddit, guildid, c : discord.Clie
 
 @c.command(aliases=['new','top'])
 async def hot(ctx,subreddit):
-    command = ctx.message.content.split(' ')[0].split('?')[1]
+    command = ctx.message.content.split(' ')[0].split('.')[1]
     try:
         reddit.subreddit(subreddit)._fetch()
     except:
