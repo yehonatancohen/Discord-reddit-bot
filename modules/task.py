@@ -110,6 +110,7 @@ class Task:
 
     async def reaction_added(self,payload : discord.RawReactionActionEvent):
         if payload.member.bot: return
+        if payload.emoji == self.upvote_unicode or payload.emoji == self.downvote_unicode: return
 
         reaction = await self.get_reaction(payload.member,str(payload.emoji))
         
@@ -127,5 +128,5 @@ class Task:
             if self.curr_submission > 0:
                 self.curr_submission -= 1
                 await self.edit_msg()
-
+        
         await reaction.remove(payload.member)
