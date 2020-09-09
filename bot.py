@@ -58,7 +58,8 @@ async def on_raw_reaction_add(payload):
 
 def get_task(msgid):
     for task in curr_tasks:
-        if task.correct_task(msgid)
+        if task.correct_task(msgid):
+            return task
     return None
 
 @c.command()
