@@ -95,7 +95,7 @@ class Task:
         await self.smsg.edit(embed=msg)
 
     def correct_task(self, msgid):
-        return self.smgs.id == msgid
+        return self.smsg.id == msgid
 
     async def send_msg(self):
         msg = self.get_message()
