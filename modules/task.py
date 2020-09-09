@@ -1,13 +1,14 @@
 from discord.ext import commands
 import discord
 import praw
+import time
 
 class Task:
     id = 0
     subreddit = ""
     guildid = 0
     msg : discord.Message
-    smsg = None
+    smsg : discord.Message
     c : discord.Client
     curr_submission = 0
     author : discord.Member
@@ -51,10 +52,19 @@ class Task:
                 if user == member:
                     return reaction
         return None
+
+    def setting_func(self, setting):
+        return_dict = {
+            'hot' : self.reddit.subreddit(self.subreddit).hot(limit=self.curr_submission + 3),
+            'new' : self.reddit.subreddit(self.subreddit).new(limit=self.curr_submission + 3),
+            'top' : self.reddit.subreddit(self.subreddit).top(limit=self.curr_submission + 3)
+        }
+        return return_dict.get(setting)
     
     def get_post(self):
         i = 0
-        for submission in getattr(self.reddit.subreddit(self.subreddit),self.setting)():
+        submissions = self.setting_func(self.setting)
+        for submission in submissions:
             if i == self.curr_submission and submission.stickied:
                 self.curr_submission += 1
             elif i == self.curr_submission and not submission.stickied:
@@ -94,25 +104,16 @@ class Task:
         msg = self.get_message()
         await self.smsg.edit(embed=msg)
 
-    def correct_task(self, msgid):
-        return self.smsg.id == msgid
-
     async def send_msg(self):
         msg = self.get_message()
         self.smsg = await self.msg.channel.send(embed=msg)
 
     async def reaction_added(self,payload : discord.RawReactionActionEvent):
+        if payload.member.bot: return
+
         reaction = await self.get_reaction(payload.member,str(payload.emoji))
-        reaction_upvote = await self.get_reaction(payload.member,self.upvote_unicode)
-        reaction_downvote = await self.get_reaction(payload.member,self.downvote_unicode)
-
-
-        if payload.member == self.c.user:
-            return
-
-        await reaction.remove(payload.member)
         
-        if payload.member != self.author and (payload.emoji.name == "▶️" or payload.emoji.name == "◀️"):
+        if payload.member != self.author:
             try:
                 await reaction.remove(payload.member)
                 return
@@ -122,28 +123,9 @@ class Task:
         if payload.emoji.name == "▶️":
             self.curr_submission += 1
             await self.edit_msg()
-            if reaction_upvote != None:
-                await reaction_upvote.remove(payload.member)
-            if reaction_downvote != None:
-                await reaction_downvote.remove(payload.member)
         if payload.emoji.name == "◀️":
             if self.curr_submission > 0:
                 self.curr_submission -= 1
                 await self.edit_msg()
-                if reaction_upvote != None:
-                    await reaction_upvote.remove(payload.member)
-                if reaction_downvote != None:
-                    await reaction_downvote.remove(payload.member)
 
-        if str(payload.emoji) == self.upvote_unicode:
-            if reaction_downvote == None:
-                return
-            else:
-                await reaction_downvote.remove(payload.member)
-                return
-        if str(payload.emoji) == self.downvote_unicode:
-            if reaction_upvote == None:
-                return
-            else:
-                await reaction_upvote.remove(payload.member)
-                return
+        await reaction.remove(payload.member)

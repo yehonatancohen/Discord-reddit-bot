@@ -41,11 +41,12 @@ async def create_task(msg : discord.Message,subreddit, guildid, c : discord.Clie
 
 @c.command(aliases=['new','top'])
 async def hot(ctx,subreddit):
-    command = ctx.message.content.split(' ')[0].split('.')[1]
+    command = ctx.message.content.split(' ')[0].split('?')[1]
     try:
         reddit.subreddit(subreddit)._fetch()
     except:
         await ctx.channel.send("Subreddit does not exist!")
+        return
     await create_task(ctx.message,subreddit,ctx.guild.id,c,reddit,nsfw_url,command)
 
 @c.event
@@ -55,12 +56,13 @@ async def on_raw_reaction_add(payload):
     task = get_task(msgid)
     if task == None: return
     await task.reaction_added(payload)
-
+    
 def get_task(msgid):
     for task in curr_tasks:
-        if task.correct_task(msgid):
+        if task.smsg.id == msgid:
             return task
     return None
+
 
 @c.command()
 async def invite(ctx):
