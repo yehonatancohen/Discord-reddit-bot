@@ -136,7 +136,8 @@ async def help(ctx):
     embed.add_field(name='.top {subreddit}', value='Sends the top submissions by order', inline=False)
     embed.add_field(name='.new {subreddit}', value='Sends the new submissions by order', inline=False)
     embed.add_field(name='.submission {url}', value='Sends the submission in a nice looking format', inline=False)
-    embed.add_field(name='.meme {url}', value='Sends a random meme from r/memes', inline=False)
+    embed.add_field(name='.meme', value='Sends a random meme from r/memes', inline=False)
+    embed.add_field(name='.contact', value='Sends information to contact the bot developer', inline=False)
     embed.add_field(name='.invite {subreddit}', value="Sends the bot's invite link for you to invite it to your server!", inline=False)
 
     await ctx.channel.send(embed=embed)
@@ -161,5 +162,10 @@ async def get_tasks(ctx):
         except:
             await ctx.channel.send("An error occured")
     return return_list
+
+@c.command()
+async def contact(ctx):
+    msg = "**To contact the developer about an issue of the bot user this email: yoncohenyon@gmail.com\n If you want to contact the developer in Discord, this is his tag: Yonac#4442**"
+    await ctx.channel.send(msg)
   
 c.run(token)
