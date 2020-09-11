@@ -3,6 +3,7 @@ import json
 import praw
 import re
 import os
+import random
 from discord.ext import commands
 from importlib.machinery import SourceFileLoader
 from modules.task import Task
@@ -62,7 +63,7 @@ def get_task(msgid):
         if task.smsg.id == msgid:
             return task
     return None
-    
+
 @c.command(aliases=['post','submission','s','get'])
 async def r(ctx, url):
     try:
@@ -134,6 +135,8 @@ async def help(ctx):
     embed.add_field(name='.hot {subreddit}', value='Sends the hot submissions by order', inline=False)
     embed.add_field(name='.top {subreddit}', value='Sends the top submissions by order', inline=False)
     embed.add_field(name='.new {subreddit}', value='Sends the new submissions by order', inline=False)
+    embed.add_field(name='.submission {url}', value='Sends the submission in a nice looking format', inline=False)
+    embed.add_field(name='.meme {url}', value='Sends a random meme from r/memes', inline=False)
     embed.add_field(name='.invite {subreddit}', value="Sends the bot's invite link for you to invite it to your server!", inline=False)
 
     await ctx.channel.send(embed=embed)
