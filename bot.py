@@ -161,12 +161,5 @@ async def get_tasks(ctx):
         except:
             await ctx.channel.send("An error occured")
     return return_list
-
-@c.command()
-async def allservers(ctx):
-    if ctx.author.id != 716755086792982549:
-        return
-    for guild in c.guilds:
-        await ctx.channel.send(f"{guild.name}: {len(guild.members)}")
   
 c.run(token)
