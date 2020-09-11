@@ -62,7 +62,60 @@ def get_task(msgid):
         if task.smsg.id == msgid:
             return task
     return None
+    
+@c.command(aliases=['post','submission','s','get'])
+async def r(ctx, url):
+    try:
+        submission = reddit.submission(url=url)
+    except:
+        await ctx.channel.send("Invalid submission url")
+        return
+    embed = get_message(submission)
+    await ctx.channel.send(embed=embed)
+    await ctx.message.delete()
 
+@c.command()
+async def meme(ctx):
+    submission = get_meme()
+    await ctx.channel.send(embed=get_message(submission))
+
+def get_meme():
+    random_post = random.randint(3,50)
+    submissions = reddit.subreddit("memes").hot(limit=random_post + 1)
+    i = 0
+    for submission in submissions:
+        if i == random_post and not submission.stickied:
+            return submission
+        else:
+            i += 1
+
+def get_message(submission):
+        embed : praw.Embed
+        if not submission.over_18:
+            if not submission.is_self:
+                
+                embed=discord.Embed(title=submission.title, url=f"https://www.reddit.com{submission.permalink}", color=0xfa0000)
+                embed.set_image(url=submission.url)
+                embed.set_footer(text=f"⬆️ {submission.score} | 💬 {submission.num_comments}")
+            else:
+                embed=discord.Embed(title=submission.title, url=f"https://www.reddit.com{submission.permalink}", color=0xfa0000)
+                embed.set_image(url=submission.url)
+                embed.set_footer(text=f"⬆️ {submission.score} | 💬 {submission.num_comments}")
+        else:
+                if channel.is_nsfw():
+                    if not submission.is_self:
+                        embed=discord.Embed(title=submission.title, url=f"https://www.reddit.com{submission.permalink}", color=0xfa0000)
+                        embed.set_image(url=submission.url)
+                        embed.set_footer(text=f"⬆️ {submission.score} | 💬 {submission.num_comments} | NSFW")
+                    else:
+                        embed=discord.Embed(title=submission.title, url=f"https://www.reddit.com{submission.permalink}", color=0xfa0000)
+                        embed.set_footer(text=f"⬆️ {submission.score} | 💬 {submission.num_comments} | NSFW")
+                else:
+                    embed=discord.Embed(title="This is a NSFW submission", url=f"https://www.reddit.com{submission.permalink}", color=0xfa0000)
+                    embed.set_image(url=self.nsfw_url)
+                    embed.set_footer(text=f"⬆️ {submission.score} | 💬 {submission.num_comments}")
+            
+        return embed
 
 @c.command()
 async def invite(ctx):

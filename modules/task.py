@@ -19,6 +19,7 @@ class Task:
     downvote_unicode = ""
     wubble_unicode = ""
     sad_unicode = ""
+    start_time : time
 
     def __init__(self, msg : discord.Message, id,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url, setting, upvote, downvote, wubble, sad):
         self.id = id
@@ -34,6 +35,7 @@ class Task:
         self.downvote_unicode = downvote
         self.wubble_unicode = wubble
         self.sad_unicode = sad
+        self.start_time = time.time()
 
     async def send_submissions(self):
         msg = self.get_message()
@@ -110,7 +112,6 @@ class Task:
 
     async def reaction_added(self,payload : discord.RawReactionActionEvent):
         if payload.member.bot: return
-        if payload.emoji == self.upvote_unicode or payload.emoji == self.downvote_unicode: return
 
         reaction = await self.get_reaction(payload.member,str(payload.emoji))
         
@@ -128,5 +129,5 @@ class Task:
             if self.curr_submission > 0:
                 self.curr_submission -= 1
                 await self.edit_msg()
-        
+
         await reaction.remove(payload.member)
