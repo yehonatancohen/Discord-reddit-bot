@@ -24,15 +24,15 @@ reddit = praw.Reddit(client_id=os.environ['REDDIT_CLIENT_ID'],
 @c.event
 async def on_ready():
     print(f"{c.user.name}")
-    await c.change_presence(activity=discord.Streaming(name=f'.help | {len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
+    await c.change_presence(activity=discord.Streaming(name=f'.help', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
 
 @c.event
 async def on_guild_join(guild):
-    await c.change_presence(activity=discord.Streaming(name=f'.help | {len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
+    await c.change_presence(activity=discord.Streaming(name=f'.help', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
 
 @c.event
 async def on_guild_remove(guild):
-    await c.change_presence(activity=discord.Streaming(name=f'.help | {len(c.guilds)} servers', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
+    await c.change_presence(activity=discord.Streaming(name=f'.help', url='https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
 
 async def create_task(msg : discord.Message,subreddit, guildid, c : discord.Client, reddit : praw.Reddit, nsfw_url, setting):
     id = len(curr_tasks) + 1
