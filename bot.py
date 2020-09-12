@@ -138,7 +138,7 @@ async def help(ctx):
     embed.add_field(name='.submission {url}', value='Sends the submission in a nice looking format', inline=False)
     embed.add_field(name='.meme', value='Sends a random meme from r/memes', inline=False)
     embed.add_field(name='.contact', value='Sends information to contact the bot developer', inline=False)
-    embed.add_field(name='.invite {subreddit}', value="Sends the bot's invite link for you to invite it to your server!", inline=False)
+    embed.add_field(name='.invite', value="Sends the bot's invite link for you to invite it to your server!", inline=False)
 
     await ctx.channel.send(embed=embed)
 
