@@ -129,5 +129,7 @@ class Task:
             if self.curr_submission > 0:
                 self.curr_submission -= 1
                 await self.edit_msg()
+        if str(payload.emoji) == self.downvote_unicode or str(payload.emoji) == self.upvote_unicode:
+            return
 
         await reaction.remove(payload.member)
