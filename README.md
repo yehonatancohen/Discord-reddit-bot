@@ -1,6 +1,7 @@
 # Discord Reddit Bot
 
 !! OUTDATED - BOT IS OFFLINE !!
+
 Discord Reddit Bot is a cool discord bot that let's you sroll reddit through discord with these features.
 
   - .hot {subreddit}
